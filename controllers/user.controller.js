@@ -6,7 +6,7 @@ import Society from "../models/Society.js";
 // ====================== BASIC USER FUNCTIONS ======================
 
 // Get logged-in user profile
-export const login = async (req, res) => {
+export const getMyProfile = async (req, res) => {
   res.status(200).json(req.user);
 };
 

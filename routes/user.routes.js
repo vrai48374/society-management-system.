@@ -1,6 +1,8 @@
 import express from "express";
 
-import { register, login, logoutUser,assignUserFullLinkage } from "../controllers/user.controller.js";
+import {assignUserFullLinkage,getMyProfile,getAllUsers,createUser,updateUser,deleteUser,getUserById } from "../controllers/user.controller.js";
+
+import { register,login,logout } from "../controllers/authController.js";
 
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
