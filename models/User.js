@@ -1,29 +1,18 @@
+// models/User.js
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Name is required"],
-  },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minlength: [6, "Password must be at least 6 characters"],
-    select: false, // never return password by default
-  },
-  role: {
-    type: String,
-    enum: ["resident", "admin", "superadmin"],
-    default: "resident",
-  },
-}, { timestamps: true });
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  role: { type: String, enum: ["superadmin", "admin", "resident"], default: "resident" },
+  flatId: { type: mongoose.Schema.Types.ObjectId, ref: "Flat" }, // link user → flat
+});
+
+
+
 
 // 🔑 Encrypt password before saving
 userSchema.pre("save", async function(next) {

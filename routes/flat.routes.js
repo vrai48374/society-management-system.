@@ -1,5 +1,5 @@
 import express from "express";
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, authorize } from "../middleware/authMiddleware.js ";
 import { createFlat, getFlatsByBlock } from "../controllers/flat.controller.js";
 
 const router = express.Router();

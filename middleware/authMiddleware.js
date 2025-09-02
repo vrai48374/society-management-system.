@@ -29,6 +29,8 @@ export const protect = async (req, res, next) => {
 // 🔹 Middleware: Role-based access (Authorization)
 export const authorize = (...allowedRoles) => {
   return (req, res, next) => {
+    console.log("👉 User role from token:", req.user.role);
+    console.log("👉 Allowed roles:", allowedRoles);
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({ success: false, message: "Access denied" });
     }

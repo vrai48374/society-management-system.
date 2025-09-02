@@ -11,11 +11,12 @@ import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Only admin can manage societies
-router.post("/", protect, authorize("admin"), createSociety);
-router.get("/", protect, authorize("admin"), getAllSocieties);
-router.get("/:id", protect, authorize("admin"), getSocietyById);
-router.put("/:id", protect, authorize("admin"), updateSociety);
-router.delete("/:id", protect, authorize("admin"), deleteSociety);
+// Only super admin can manage societies
+router.post("/", protect, authorize("superadmin"), createSociety);
+router.get("/", protect, authorize("superadmin"), getAllSocieties);
+router.get("/:id", protect, authorize("superadmin"), getSocietyById);
+router.put("/:id", protect, authorize("superadmin"), updateSociety);
+router.delete("/:id", protect, authorize("superadmin"), deleteSociety);
+
 
 export default router;
