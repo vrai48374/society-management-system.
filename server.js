@@ -17,7 +17,21 @@ import { connectDB } from "./config/db.js";
 import userRoutes from "./routes/user.routes.js";
 
 import societyRoutes from "./routes/society.routes.js";
+
+
+import blockRoutes from "./routes/block.routes.js";
+import flatRoutes from "./routes/flat.routes.js";
+
 const app = express();
+
+// Existing routes
+
+// New routes
+
+
+app.use("/api/blocks", blockRoutes);
+app.use("/api/flats", flatRoutes);
+
 
 // 🔹 Global Middlewares
 app.use(helmet());                      // security headers
@@ -43,12 +57,17 @@ app.use("/api/auth", authRoutes);      // register/login
 app.use("/api", profileRoutes);        // protected routes
 
 
+// society
+app.use("/api/users", userRoutes);
+app.use("/api/societies", societyRoutes);
+
+app.use("/api/blocks", blockRoutes);
+app.use("/api/flats", flatRoutes);
+
 // 🔹 404 & Error Handler
 app.use(notFound);
 app.use(errorHandler);
 
-// society
-app.use("/api/societies", societyRoutes);
 
 // 🔹 Start Server
 const PORT = process.env.PORT || 5000;
