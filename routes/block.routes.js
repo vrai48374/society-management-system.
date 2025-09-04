@@ -11,6 +11,6 @@ router.post("/", protect, authorize("admin", "superadmin"), createBlock);
 router.get("/:societyId", protect, getBlocksBySociety);
 
 // 🔹 Get Block with Flats
-router.get("/details/:id", protect, getBlockWithFlats);
+router.get("/:id/details", protect, authorize("admin", "superadmin"), getBlockWithFlats);
 
 export default router;

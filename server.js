@@ -7,7 +7,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 import { apiLimiter } from "./middleware/rateLimiter.js";
-import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import {  errorHandler } from "./middleware/errorHandler.js";
 import { connectDB } from "./config/db.js";
 
 // Routes
@@ -18,6 +18,7 @@ import userRoutes from "./routes/user.routes.js";
 import societyRoutes from "./routes/society.routes.js";
 import blockRoutes from "./routes/block.routes.js";
 import flatRoutes from "./routes/flat.routes.js";
+
 
 const app = express();
 
@@ -48,7 +49,6 @@ app.use("/api/blocks", blockRoutes);        // ✅ blocks
 app.use("/api/flats", flatRoutes);          // ✅ flats
 
 // 🔹 404 & error handler
-app.use(notFound);
 app.use(errorHandler);
 
 // 🔹 Start server

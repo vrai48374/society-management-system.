@@ -15,6 +15,7 @@ const flatSchema = new mongoose.Schema({
     ref: "Block",   // 🔹 This is required for populate()
     required: true,
   },
+  society: { type: mongoose.Schema.Types.ObjectId, ref: "Society", required: true },
   residents: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 });
 

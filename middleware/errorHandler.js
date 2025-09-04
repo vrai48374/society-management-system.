@@ -1,19 +1,27 @@
-import { StatusCodes } from "http-status-codes";
+// middleware/errorMiddleware.js
+const errorHandler = (err, req, res, next) => {
+  console.error(err.stack);
 
-// Runs if route is not found
-export function notFound(req, res, next) {
-  res.status(StatusCodes.NOT_FOUND).json({
+  let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  let message = err.message;
+
+  // Duplicate key error (like email unique)
+  if (err.code === 11000) {
+    statusCode = 400;
+    const field = Object.keys(err.keyValue);
+    message = `Duplicate value for field: ${field}`;
+  }
+
+  // Validation error (missing fields etc.)
+  if (err.name === "ValidationError") {
+    statusCode = 400;
+    message = Object.values(err.errors).map((val) => val.message).join(", ");
+  }
+
+  res.status(statusCode).json({
     success: false,
-    message: "Route not found",
+    message,
   });
-}
+};
 
-// Runs if any error is thrown
-export function errorHandler(err, req, res, next) {
-  console.error("Error:", err.message);
-
-  res.status(err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-}
+export { errorHandler };

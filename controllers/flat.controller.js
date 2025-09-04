@@ -4,7 +4,7 @@ import Block from "../models/Block.js";
 // Create Flat inside a Block
 export const createFlat = async (req, res) => {
   try {
-    const { blockId, flatNumber } = req.body;
+    const { blockId, flatNumber, societyId } = req.body;
 
     // Check if block exists
     const block = await Block.findById(blockId);
@@ -20,13 +20,17 @@ export const createFlat = async (req, res) => {
 
     // Create flat
     const flat = await Flat.create({
-      number: flatNumber,
-      block: blockId
-    });
+  number: flatNumber,
+  block: blockId,
+});
 
-    // Update block flat count
-    block.flats.push(flat._id);
-    await block.save();
+// ✅ Push into block.flats
+if (!block.flats.includes(flat._id)) {
+  block.flats.push(flat._id);
+}
+block.totalFlats = block.flats.length;
+await block.save();
+
 
     res.status(201).json({ success: true, data: flat });
   } catch (err) {
@@ -46,13 +50,17 @@ export const getFlatsByBlock = async (req, res) => {
 };
 
 // Get Flat with its User
-export const getFlatWithUser = async (req, res) => {
+export const getFlatsBySociety = async (req, res) => {
   try {
-    const flat = await Flat.findById(req.params.id).populate("owner");
-    if (!flat) {
-      return res.status(404).json({ success: false, message: "Flat not found" });
+    const flats = await Flat.find({ society: req.params.societyId })
+      .populate("owner")   // get user details
+      .populate("block");  // get block details
+
+    if (!flats || flats.length === 0) {
+      return res.status(404).json({ success: false, message: "No flats found in this society" });
     }
-    res.status(200).json({ success: true, data: flat });
+
+    res.status(200).json({ success: true, count: flats.length, data: flats });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
