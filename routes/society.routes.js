@@ -4,7 +4,8 @@ import {
   getAllSocieties, 
   getSocietyById, 
   updateSociety, 
-  deleteSociety 
+  deleteSociety ,
+  getSocietyWithBlocks,
 } from "../controllers/society.controller.js";
 
 import { protect, authorize } from "../middleware/authMiddleware.js";
@@ -17,6 +18,7 @@ router.get("/", protect, authorize("superadmin"), getAllSocieties);
 router.get("/:id", protect, authorize("superadmin"), getSocietyById);
 router.put("/:id", protect, authorize("superadmin"), updateSociety);
 router.delete("/:id", protect, authorize("superadmin"), deleteSociety);
+router.get("/:id/details", protect, authorize("superadmin"), getSocietyWithBlocks);
 
 
 export default router;

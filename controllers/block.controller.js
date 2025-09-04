@@ -11,7 +11,11 @@ export const createBlock = async (req, res) => {
       return res.status(404).json({ success: false, message: "Society not found" });
     }
 
-    const block = await Block.create({ societyId, blockName });
+    const block = await Block.create({
+  name: blockName,
+  society: societyId
+});
+
 
     // update society block count
     society.totalBlocks += 1;
@@ -29,6 +33,18 @@ export const getBlocksBySociety = async (req, res) => {
     const { societyId } = req.params;
     const blocks = await Block.find({ societyId });
     res.status(200).json({ success: true, data: blocks });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+// Get Block with its Flats
+export const getBlockWithFlats = async (req, res) => {
+  try {
+    const block = await Block.findById(req.params.id).populate("flats");
+    if (!block) {
+      return res.status(404).json({ success: false, message: "Block not found" });
+    }
+    res.status(200).json({ success: true, data: block });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

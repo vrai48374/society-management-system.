@@ -19,10 +19,13 @@ export const createFlat = async (req, res) => {
     }
 
     // Create flat
-    const flat = await Flat.create({ blockId, flatNumber });
+    const flat = await Flat.create({
+      number: flatNumber,
+      block: blockId
+    });
 
     // Update block flat count
-    block.totalFlats += 1;
+    block.flats.push(flat._id);
     await block.save();
 
     res.status(201).json({ success: true, data: flat });
@@ -37,6 +40,19 @@ export const getFlatsByBlock = async (req, res) => {
     const { blockId } = req.params;
     const flats = await Flat.find({ blockId }).populate("owner", "name email");
     res.status(200).json({ success: true, data: flats });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Get Flat with its User
+export const getFlatWithUser = async (req, res) => {
+  try {
+    const flat = await Flat.findById(req.params.id).populate("owner");
+    if (!flat) {
+      return res.status(404).json({ success: false, message: "Flat not found" });
+    }
+    res.status(200).json({ success: true, data: flat });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

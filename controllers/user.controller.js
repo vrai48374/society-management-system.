@@ -50,25 +50,25 @@ export const deleteUser = async (req, res) => {
 
 // ====================== FULL LINKAGE FUNCTION ======================
 
-// Assign user → flat → block → society
 export const assignUserFullLinkage = async (req, res) => {
   try {
-    const { userId, flatId, blockId, societyId } = req.body;
+    const { userId, flatId } = req.body;
 
     // 🔹 Check user
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     // 🔹 Check flat
-    const flat = await Flat.findById(flatId);
+    const flat = await Flat.findById(flatId).populate({
+      path: "block",
+      populate: { path: "society" }
+    });
     if (!flat) return res.status(404).json({ success: false, message: "Flat not found" });
 
-    // 🔹 Check block
-    const block = await Block.findById(blockId);
+    const block = flat.block;
     if (!block) return res.status(404).json({ success: false, message: "Block not found" });
 
-    // 🔹 Check society
-    const society = await Society.findById(societyId);
+    const society = block.society;
     if (!society) return res.status(404).json({ success: false, message: "Society not found" });
 
     // ✅ Link user ↔ flat
@@ -76,19 +76,7 @@ export const assignUserFullLinkage = async (req, res) => {
     await user.save();
 
     flat.owner = user._id;
-    flat.block = block._id;
     await flat.save();
-
-    // ✅ Link block ↔ society
-    if (!block.society) {
-      block.society = society._id;
-      await block.save();
-    }
-
-    if (!society.blocks.includes(block._id)) {
-      society.blocks.push(block._id);
-      await society.save();
-    }
 
     res.status(200).json({
       success: true,
@@ -104,3 +92,28 @@ export const assignUserFullLinkage = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Get User with full linkage details
+export const getUserFullDetails = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .populate({
+        path: "flat",
+        populate: {
+          path: "block",
+          populate: {
+            path: "society"
+          }
+        }
+      });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
