@@ -34,7 +34,7 @@ await block.save();
 
     res.status(201).json({ success: true, data: flat });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
 
@@ -45,7 +45,7 @@ export const getFlatsByBlock = async (req, res) => {
     const flats = await Flat.find({ blockId }).populate("owner", "name email");
     res.status(200).json({ success: true, data: flats });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
 
@@ -62,6 +62,35 @@ export const getFlatsBySociety = async (req, res) => {
 
     res.status(200).json({ success: true, count: flats.length, data: flats });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
+  }
+};
+
+// controllers/flat.controller.js
+export const getAllFlats = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10, blockId } = req.query;
+
+    const query = blockId ? { block: blockId } : {};
+
+    const flats = await Flat.find(query)
+      .populate("owner", "name email") // only show basic owner info
+      .populate("block", "name")       // block name only
+      .populate("society", "name")     // society name only
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+
+    const total = await Flat.countDocuments(query);
+
+    res.json({
+      success: true,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      data: flats,
+    });
+  } catch (err) {
+    next(err);
   }
 };

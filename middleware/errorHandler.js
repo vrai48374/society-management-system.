@@ -3,24 +3,35 @@ const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
 
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  let message = err.message;
+  let errors = [];
 
   // Duplicate key error (like email unique)
   if (err.code === 11000) {
     statusCode = 400;
     const field = Object.keys(err.keyValue);
-    message = `Duplicate value for field: ${field}`;
+    errors.push({
+      field,
+      message: `Duplicate value for field: ${field}`,
+    });
   }
-
   // Validation error (missing fields etc.)
-  if (err.name === "ValidationError") {
+  else if (err.name === "ValidationError") {
     statusCode = 400;
-    message = Object.values(err.errors).map((val) => val.message).join(", ");
+    errors = Object.values(err.errors).map((val) => ({
+      field: val.path,
+      message: val.message,
+    }));
+  }
+  // Custom error messages (like not found, forbidden, etc.)
+  else {
+    errors.push({
+      message: err.message || "Server Error",
+    });
   }
 
   res.status(statusCode).json({
     success: false,
-    message,
+    errors,
   });
 };
 

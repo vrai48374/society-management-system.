@@ -27,7 +27,7 @@ await society.save();
 
     res.status(201).json({ success: true, data: block });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
 
@@ -38,7 +38,7 @@ export const getBlocksBySociety = async (req, res) => {
     const blocks = await Block.find({ society: societyId }); // ✅ use "society" field, not societyId
     res.status(200).json({ success: true, data: blocks });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
 
@@ -54,6 +54,33 @@ export const getBlockWithFlats = async (req, res) => {
 
     res.status(200).json({ success: true, data: block });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
+  }
+};
+
+// controllers/block.controller.js
+export const getAllBlocks = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10, societyId } = req.query;
+
+    const query = societyId ? { society: societyId } : {};
+
+    const blocks = await Block.find(query)
+      .populate("society", "name") // only society name
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+
+    const total = await Block.countDocuments(query);
+
+    res.json({
+      success: true,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      data: blocks,
+    });
+  } catch (err) {
+    next(err);
   }
 };

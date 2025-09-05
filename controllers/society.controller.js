@@ -12,19 +12,11 @@ export const createSociety = async (req, res) => {
     });
     res.status(201).json(society);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error); // Pass error to errorHandler middleware
   }
 };
 
 // Get all Societies
-export const getAllSocieties = async (req, res) => {
-  try {
-    const societies = await Society.find();
-    res.json(societies);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 // Get Society by ID
 export const getSocietyById = async (req, res) => {
@@ -33,7 +25,7 @@ export const getSocietyById = async (req, res) => {
     if (!society) return res.status(404).json({ message: "Society not found" });
     res.json(society);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error); // Pass error to errorHandler middleware
   }
 };
 
@@ -48,7 +40,7 @@ export const updateSociety = async (req, res) => {
     if (!society) return res.status(404).json({ message: "Society not found" });
     res.json(society);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error); // Pass error to errorHandler middleware
   }
 };
 
@@ -59,7 +51,7 @@ export const deleteSociety = async (req, res) => {
     if (!society) return res.status(404).json({ message: "Society not found" });
     res.json({ message: "Society deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error); // Pass error to errorHandler middleware
   }
 };
 // Society → Blocks
@@ -71,7 +63,7 @@ export const getSocietyWithBlocks = async (req, res) => {
     }
     res.status(200).json({ success: true, data: society });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
 
@@ -96,6 +88,29 @@ export const getSocietyDetails = async (req, res) => {
 
     res.status(200).json({ success: true, data: society });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
+  }
+};
+// controllers/society.controller.js
+export const getAllSocieties = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+
+    const societies = await Society.find()
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+
+    const total = await Society.countDocuments();
+
+    res.json({
+      success: true,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      data: societies,
+    });
+  } catch (err) {
+    next(err);
   }
 };

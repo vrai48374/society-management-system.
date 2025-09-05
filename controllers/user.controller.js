@@ -11,10 +11,6 @@ export const getMyProfile = async (req, res) => {
 };
 
 // Get all users (admin only)
-export const getAllUsers = async (req, res) => {
-  const users = await User.find();
-  res.status(200).json(users);
-};
 
 // Get single user by ID (admin only)
 export const getUserById = async (req, res) => {
@@ -30,7 +26,7 @@ export const createUser = async (req, res) => {
     const user = await User.create({ name, email, password, role });
     res.status(201).json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
 
@@ -93,7 +89,7 @@ export const assignUserFullLinkage = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error); // Pass error to errorHandler middleware
   }
 };
 
@@ -117,7 +113,34 @@ export const getUserFullDetails = async (req, res) => {
 
     res.status(200).json({ success: true, data: user });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    next(err); // Pass error to errorHandler middleware
   }
 };
+// controllers/user.controller.js
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10, role } = req.query;
+
+    const query = role ? { role } : {};
+
+    const users = await User.find(query)
+      .select("-password")
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+
+    const total = await User.countDocuments(query);
+
+    res.json({
+      success: true,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      data: users,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 
