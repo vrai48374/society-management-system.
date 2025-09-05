@@ -74,3 +74,28 @@ export const getSocietyWithBlocks = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// Society → Blocks → Flats → Users
+export const getSocietyDetails = async (req, res) => {
+  try {
+    const society = await Society.findById(req.params.id)
+      .populate({
+        path: "blocks",
+        populate: {
+          path: "flats",
+          populate: {
+            path: "users", // ✅ users inside flats
+            select: "name email role" // only essential fields
+          }
+        }
+      });
+
+    if (!society) {
+      return res.status(404).json({ success: false, message: "Society not found" });
+    }
+
+    res.status(200).json({ success: true, data: society });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

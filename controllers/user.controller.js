@@ -74,6 +74,10 @@ export const assignUserFullLinkage = async (req, res) => {
     // ✅ Link user ↔ flat
     user.flat = flat._id;
     await user.save();
+    if (!flat.residents.includes(user._id)) {
+  flat.residents.push(user._id);
+}
+
 
     flat.owner = user._id;
     await flat.save();
