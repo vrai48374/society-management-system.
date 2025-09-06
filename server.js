@@ -21,6 +21,9 @@ import flatRoutes from "./routes/flat.routes.js";
 import ticketRoutes from "./routes/ticket.routes.js";
 import issueRoutes from "./routes/issue.routes.js"; // issues
 
+// payment routes
+import paymentRoutes from "./routes/payment.routes.js";
+
 const app = express();
 
 // 🔹 Security & Performance Middlewares
@@ -53,6 +56,7 @@ app.use("/api/blocks", blockRoutes);        // blocks
 app.use("/api/flats", flatRoutes);          // flats
 app.use("/api/tickets", ticketRoutes);      // tickets
 app.use("/api/issues", issueRoutes);        // issues
+app.use("/api/payments", paymentRoutes);  // payments
 
 // 🔹 404 handler
 app.use((req, res, next) => {

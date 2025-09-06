@@ -2,50 +2,52 @@ import Flat from "../models/Flat.js";
 import Block from "../models/Block.js";
 
 // Create Flat inside a Block
-export const createFlat = async (req, res) => {
+export const createFlat = async (req, res, next) => {
   try {
-    const { blockId, flatNumber, societyId } = req.body;
+    const { blockId, flatNumber } = req.body;
 
     // Check if block exists
-    const block = await Block.findById(blockId);
+    const block = await Block.findById(blockId).populate("society");
     if (!block) {
       return res.status(404).json({ success: false, message: "Block not found" });
     }
 
     // Prevent duplicate flat numbers in the same block
-    const existingFlat = await Flat.findOne({ blockId, flatNumber });
+    const existingFlat = await Flat.findOne({ block: blockId, number: flatNumber });
     if (existingFlat) {
       return res.status(400).json({ success: false, message: "Flat number already exists in this block" });
     }
 
-    // Create flat
+    // Create flat (auto-assign society from block)
     const flat = await Flat.create({
-  number: flatNumber,
-  block: blockId,
-});
+      number: flatNumber,
+      block: blockId,
+      society: block.society, // 🔹 auto pick society
+    });
 
-// ✅ Push into block.flats
-if (!block.flats.includes(flat._id)) {
-  block.flats.push(flat._id);
-}
-block.totalFlats = block.flats.length;
-await block.save();
-
+    // ✅ Push into block.flats
+    if (!block.flats.includes(flat._id)) {
+      block.flats.push(flat._id);
+    }
+    block.totalFlats = block.flats.length;
+    await block.save();
 
     res.status(201).json({ success: true, data: flat });
   } catch (err) {
-    next(err); // Pass error to errorHandler middleware
+    next(err);
   }
 };
 
+
 // Get all Flats of a Block
-export const getFlatsByBlock = async (req, res) => {
+export const getFlatsByBlock = async (req, res, next) => {
   try {
     const { blockId } = req.params;
-    const flats = await Flat.find({ blockId }).populate("owner", "name email");
+    const flats = await Flat.find({ block: blockId }).populate("owner", "name email");
+
     res.status(200).json({ success: true, data: flats });
   } catch (err) {
-    next(err); // Pass error to errorHandler middleware
+    next(err);
   }
 };
 
