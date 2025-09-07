@@ -12,14 +12,14 @@ const userSchema = new mongoose.Schema({
 });
 
 
-// 🔑 Encrypt password before saving
+//  Encrypt password before saving
 userSchema.pre("save", async function(next) {
   if (!this.isModified("password")) return next(); // if password unchanged
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// ✅ Compare password during login
+//  Compare password during login
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

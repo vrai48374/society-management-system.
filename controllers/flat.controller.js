@@ -25,7 +25,7 @@ export const createFlat = async (req, res, next) => {
       society: block.society, // 🔹 auto pick society
     });
 
-    // ✅ Push into block.flats
+    //  Push into block.flats
     if (!block.flats.includes(flat._id)) {
       block.flats.push(flat._id);
     }

@@ -30,7 +30,7 @@ export const createIssue = async (req, res) => {
 // Get all Issues (Admin/Superadmin)
 export const getAllIssues = async (req, res) => {
   try {
-    console.log("👉 Resident ID from token:", req.user._id);
+    console.log(" Resident ID from token:", req.user._id);
     const issues = await Issue.find()
       .populate("raisedBy", "name email")
       .populate("flat", "number")

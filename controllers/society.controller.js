@@ -76,7 +76,7 @@ export const getSocietyDetails = async (req, res) => {
         populate: {
           path: "flats",
           populate: {
-            path: "users", // ✅ users inside flats
+            path: "users", //  users inside flats
             select: "name email role" // only essential fields
           }
         }

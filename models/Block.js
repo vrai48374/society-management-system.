@@ -17,6 +17,6 @@ const blockSchema = new mongoose.Schema({
     required: true,
   },
 });
-// ✅ Prevent duplicate block names inside the same society
+// Prevent duplicate block names inside the same society
 blockSchema.index({ society: 1, name: 1 }, { unique: true });
 export default mongoose.model("Block", blockSchema);

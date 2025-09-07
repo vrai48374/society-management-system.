@@ -6,19 +6,19 @@ export const createBlock = async (req, res) => {
   try {
     const { societyId, blockName } = req.body;
 
-    // 1️⃣ Check if society exists
+    // 1️ Check if society exists
     const society = await Society.findById(societyId);
     if (!society) {
       return res.status(404).json({ success: false, message: "Society not found" });
     }
 
-    // 2️⃣ Create block with society reference
+    // 2 Create block with society reference
     const block = await Block.create({
   name: blockName,
   society: societyId,
 });
 
-// ✅ Push block into society.blocks only if not exists
+//  Push block into society.blocks only if not exists
 if (!society.blocks.includes(block._id)) {
   society.blocks.push(block._id);
 }

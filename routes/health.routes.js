@@ -20,7 +20,7 @@ export default router;
 
 // It usually returns a small JSON with status information.
 
-// 🔹 Why do we use it?
+//  Why do we use it?
 
 // Server monitoring
 
@@ -38,7 +38,7 @@ export default router;
 
 // No need to check DB or routes manually.
 
-// 🔹 What functionality it adds to your project?
+//  What functionality it adds to your project?
 
 // Adds a heartbeat API.
 

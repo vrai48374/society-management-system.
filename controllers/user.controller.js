@@ -3,7 +3,7 @@ import Flat from "../models/Flat.js";
 import Block from "../models/Block.js";
 import Society from "../models/Society.js";
 
-// ====================== BASIC USER FUNCTIONS ======================
+// BASIC USER FUNCTIONS
 
 // Get logged-in user profile
 export const getMyProfile = async (req, res) => {
@@ -44,17 +44,17 @@ export const deleteUser = async (req, res) => {
   res.status(200).json({ message: "User deleted" });
 };
 
-// ====================== FULL LINKAGE FUNCTION ======================
+//  FULL LINKAGE FUNCTION 
 
 export const assignUserFullLinkage = async (req, res) => {
   try {
     const { userId, flatId } = req.body;
 
-    // 🔹 Check user
+    // Check user
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    // 🔹 Check flat
+    //  Check flat
     const flat = await Flat.findById(flatId).populate({
       path: "block",
       populate: { path: "society" }
@@ -67,7 +67,7 @@ export const assignUserFullLinkage = async (req, res) => {
     const society = block.society;
     if (!society) return res.status(404).json({ success: false, message: "Society not found" });
 
-    // ✅ Link user ↔ flat
+    //  Link user ↔ flat
     user.flat = flat._id;
     await user.save();
     if (!flat.residents.includes(user._id)) {

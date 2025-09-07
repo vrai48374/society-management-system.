@@ -19,7 +19,7 @@ const flatSchema = new mongoose.Schema({
   residents: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 });
 
-//✅ Prevent duplicate flat numbers inside the same block
+// Prevent duplicate flat numbers inside the same block
 flatSchema.index({ block: 1, number: 1 }, { unique: true });
 
 export default mongoose.model("Flat", flatSchema);

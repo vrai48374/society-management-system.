@@ -1,14 +1,14 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
-// 🔑 Generate JWT
+// Generate JWT
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
 
-// 📌 REGISTER
+// REGISTER
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
@@ -22,7 +22,7 @@ export const register = async (req, res, next) => {
     const user = await User.create({ name, email, password, role });
     const token = generateToken(user._id);
 
-    // ✅ Set token in cookie
+    //  Set token in cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -39,7 +39,7 @@ export const register = async (req, res, next) => {
   }
 };
 
-// 📌 LOGIN
+//  LOGIN
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -56,7 +56,7 @@ export const login = async (req, res, next) => {
 
     const token = generateToken(user._id);
 
-    // ✅ Set token in cookie
+    //  Set token in cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -73,7 +73,7 @@ export const login = async (req, res, next) => {
   }
 };
 
-// 📌 LOGOUT
+//  LOGOUT
 export const logout = (req, res) => {
   res.clearCookie("token");
   res.json({ success: true, message: "Logged out successfully" });

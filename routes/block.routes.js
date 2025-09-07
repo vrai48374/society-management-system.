@@ -4,13 +4,13 @@ import { createBlock, getBlocksBySociety,getBlockWithFlats, } from "../controlle
 
 const router = express.Router();
 
-// 🔹 Create Block (Admin only)
+//  Create Block (Admin only)
 router.post("/", protect, authorize("admin", "superadmin"), createBlock);
 
-// 🔹 Get all Blocks of a Society
+//  Get all Blocks of a Society
 router.get("/:societyId", protect, getBlocksBySociety);
 
-// 🔹 Get Block with Flats
+//  Get Block with Flats
 router.get("/:id/details", protect, authorize("admin", "superadmin"), getBlockWithFlats);
 
 export default router;
