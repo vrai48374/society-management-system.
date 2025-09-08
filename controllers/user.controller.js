@@ -6,9 +6,34 @@ import Society from "../models/Society.js";
 // BASIC USER FUNCTIONS
 
 // Get logged-in user profile
-export const getMyProfile = async (req, res) => {
-  res.status(200).json(req.user);
+// controllers/user.controller.js
+export const getMyProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select("-password")
+      .populate({
+        path: "flat",
+        populate: {
+          path: "block",
+          populate: {
+            path: "society",
+            select: "name address"
+          },
+          select: "name"
+        },
+        select: "number"
+      });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    next(err);
+  }
 };
+
 
 // Get all users (admin only)
 

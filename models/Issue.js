@@ -12,8 +12,8 @@ const issueSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
+      enum: ["normal", "medium", "high"],
+      default: "normal",
     },
     raisedBy: {
       type: mongoose.Schema.Types.ObjectId,

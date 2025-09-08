@@ -8,12 +8,54 @@ const generateToken = (userId) => {
   });
 };
 
+// LOGIN
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Populate assignedSociety to get society details
+    const user = await User.findOne({ email }).select("+password").populate('assignedSociety');
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
+    }
+    
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
+    }
+    
+    const token = generateToken(user._id);
+    
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    
+    // Include assignedSociety in the response
+    res.json({
+      success: true,
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role,
+        assignedSociety: user.assignedSociety // Now includes society data
+      },
+      token
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Optionally, update the register function similarly if needed
 // REGISTER
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Check existing user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ success: false, message: "User already exists" });
@@ -22,7 +64,6 @@ export const register = async (req, res, next) => {
     const user = await User.create({ name, email, password, role });
     const token = generateToken(user._id);
 
-    //  Set token in cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -30,41 +71,8 @@ export const register = async (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // Populate assignedSociety after creation if needed, but typically not set during registration
     res.status(201).json({
-      success: true,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-//  LOGIN
-export const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email }).select("+password");
-    if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid email or password" });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ success: false, message: "Invalid email or password" });
-    }
-
-    const token = generateToken(user._id);
-
-    //  Set token in cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.json({
       success: true,
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });

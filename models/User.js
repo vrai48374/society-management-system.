@@ -8,7 +8,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   role: { type: String, enum: ["superadmin", "admin", "resident"], default: "resident" },
-  flat: { type: mongoose.Schema.Types.ObjectId, ref: "Flat" }, // link user → flat
+  flat: { type: mongoose.Schema.Types.ObjectId, ref: "Flat" }, // link user → flat,
+  assignedSociety: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Society",
+  default: null,
+},
 });
 
 

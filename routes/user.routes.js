@@ -18,6 +18,7 @@ import { createSociety } from "../controllers/society.controller.js";
 
 const router = express.Router();
 
+
 // Resident
 router.get("/me", protect, getMyProfile);
 

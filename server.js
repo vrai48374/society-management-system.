@@ -20,18 +20,25 @@ import blockRoutes from "./routes/block.routes.js";
 import flatRoutes from "./routes/flat.routes.js";
 import ticketRoutes from "./routes/ticket.routes.js";
 import issueRoutes from "./routes/issue.routes.js"; // issues
+import adminRoutes from "./routes/admin.routes.js";
 
 // payment routes
-import paymentRoutes from "./routes/payment.routes.js";
+// import paymentRoutes from "./routes/payment.routes.js";
 
 const app = express();
 
 // 🔹 Security & Performance Middlewares
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500"
+  ],
   credentials: true,
 }));
+
 app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -56,7 +63,8 @@ app.use("/api/blocks", blockRoutes);        // blocks
 app.use("/api/flats", flatRoutes);          // flats
 app.use("/api/tickets", ticketRoutes);      // tickets
 app.use("/api/issues", issueRoutes);        // issues
-app.use("/api/payments", paymentRoutes);  // payments
+// app.use("/api/payments", paymentRoutes);  // payments
+app.use("/api/admin", adminRoutes);
 
 // 🔹 404 handler
 app.use((req, res, next) => {

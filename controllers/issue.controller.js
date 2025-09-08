@@ -4,7 +4,7 @@ import Flat from "../models/Flat.js";
 // Create Issue (Resident)
 export const createIssue = async (req, res) => {
   try {
-    const { title, description, flatId, priority } = req.body;
+    const { title, description, flatId } = req.body; // 🚨 removed priority from body
 
     const flat = await Flat.findById(flatId).populate("block");
     if (!flat) {
@@ -14,7 +14,7 @@ export const createIssue = async (req, res) => {
     const issue = await Issue.create({
       title,
       description,
-      priority,
+      priority: "normal", // 🚀 always start as normal
       raisedBy: req.user._id,
       flat: flat._id,
       block: flat.block._id,
@@ -27,16 +27,24 @@ export const createIssue = async (req, res) => {
   }
 };
 
+
+import { getDynamicPriority } from "../utils/priority.js";
+
 // Get all Issues (Admin/Superadmin)
 export const getAllIssues = async (req, res) => {
   try {
-    console.log(" Resident ID from token:", req.user._id);
     const issues = await Issue.find()
       .populate("raisedBy", "name email")
       .populate("flat", "number")
       .populate("block", "name")
       .populate("society", "name");
-    res.status(200).json({ success: true, data: issues });
+
+    const updated = issues.map(i => ({
+      ...i.toObject(),
+      priority: getDynamicPriority(i), // auto escalation
+    }));
+
+    res.status(200).json({ success: true, data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -49,11 +57,18 @@ export const getMyIssues = async (req, res) => {
       .populate("flat", "number")
       .populate("block", "name")
       .populate("society", "name");
-    res.status(200).json({ success: true, data: issues });
+
+    const updated = issues.map(i => ({
+      ...i.toObject(),
+      priority: getDynamicPriority(i),
+    }));
+
+    res.status(200).json({ success: true, data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 // Update Issue Status (Generic Admin Update)
 export const updateIssueStatus = async (req, res) => {
@@ -115,4 +130,11 @@ export const closeIssue = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+};
+// in issue.controller.js
+export const clearOldIssues = async (req,res)=>{
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate()-30); // 30 days ago
+  await Issue.deleteMany({ createdAt: { $lt: cutoff } });
+  res.json({ success:true, message:"Old issues cleared" });
 };

@@ -2,37 +2,67 @@ import Flat from "../models/Flat.js";
 import Block from "../models/Block.js";
 
 // Create Flat inside a Block
+
 export const createFlat = async (req, res, next) => {
   try {
-    const { blockId, flatNumber } = req.body;
+    // accept both styles: blockId/block, flatNumber/number, societyId/society
+    const { blockId, block, flatNumber, number, societyId, society, owner } = req.body;
 
-    // Check if block exists
-    const block = await Block.findById(blockId).populate("society");
-    if (!block) {
+    const blockRef = blockId || block;          // support both blockId and block
+    const flatNum = flatNumber || number;       // support both flatNumber and number
+    const societyRef = societyId || society;    // support both societyId and society
+
+    if (!blockRef || !societyRef || !flatNum) {
+      return res.status(400).json({ success: false, message: "blockId, societyId and flatNumber are required" });
+    }
+
+    const blockDoc = await Block.findById(blockRef);
+    if (!blockDoc) {
       return res.status(404).json({ success: false, message: "Block not found" });
     }
 
-    // Prevent duplicate flat numbers in the same block
-    const existingFlat = await Flat.findOne({ block: blockId, number: flatNumber });
-    if (existingFlat) {
-      return res.status(400).json({ success: false, message: "Flat number already exists in this block" });
+    // ✅ Restrict admin to their assigned society
+    if (req.user.role === "admin" && req.user.assignedSociety.toString() !== blockDoc.society.toString()) {
+      return res.status(403).json({ success: false, message: "Admins can only manage their own society" });
     }
 
-    // Create flat (auto-assign society from block)
     const flat = await Flat.create({
-      number: flatNumber,
-      block: blockId,
-      society: block.society, // 🔹 auto pick society
+      number: flatNum,
+      block: blockRef,
+      society: societyRef,
+      owner: owner || null
     });
 
-    //  Push into block.flats
-    if (!block.flats.includes(flat._id)) {
-      block.flats.push(flat._id);
+    if (!blockDoc.flats.includes(flat._id)) {
+      blockDoc.flats.push(flat._id);
     }
-    block.totalFlats = block.flats.length;
-    await block.save();
+    await blockDoc.save();
 
     res.status(201).json({ success: true, data: flat });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateFlat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { number } = req.body;
+
+    const flat = await Flat.findById(id).populate("block");
+    if (!flat) {
+      return res.status(404).json({ success: false, message: "Flat not found" });
+    }
+
+    // Restrict admin to their assigned society
+    if (req.user.role === "admin" && req.user.assignedSociety.toString() !== flat.block.society.toString()) {
+      return res.status(403).json({ success: false, message: "Admins can only manage their own society" });
+    }
+
+    flat.number = number || flat.number;
+    await flat.save();
+
+    res.status(200).json({ success: true, data: flat });
   } catch (err) {
     next(err);
   }
@@ -92,6 +122,34 @@ export const getAllFlats = async (req, res, next) => {
       totalPages: Math.ceil(total / limit),
       data: flats,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+export const deleteFlat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const flat = await Flat.findById(id).populate("block");
+    if (!flat) {
+      return res.status(404).json({ success: false, message: "Flat not found" });
+    }
+
+    // Restrict admin to their assigned society
+    if (req.user.role === "admin" && req.user.assignedSociety.toString() !== flat.block.society.toString()) {
+      return res.status(403).json({ success: false, message: "Admins can only manage their own society" });
+    }
+
+    // Remove flat reference from block
+    const block = await Block.findById(flat.block._id);
+    if (block) {
+      block.flats = block.flats.filter(fId => fId.toString() !== flat._id.toString());
+      await block.save();
+    }
+
+    await flat.remove();
+
+    res.status(200).json({ success: true, message: "Flat deleted successfully" });
   } catch (err) {
     next(err);
   }

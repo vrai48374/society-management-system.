@@ -9,7 +9,7 @@ import {
   closeIssue,
 } from "../controllers/issue.controller.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
-
+import { clearOldIssues } from "../controllers/issue.controller.js";
 const router = express.Router();
 
 // Resident: Raise an issue
@@ -29,5 +29,6 @@ router.put("/:id/resolve", protect, authorize("admin", "superadmin"), resolveIss
 
 // Resident (who raised) OR Admin/Superadmin: Close issue
 router.put("/:id/close", protect, authorize("resident", "admin", "superadmin"), closeIssue);
+router.delete("/clear-old", clearOldIssues);
 
 export default router;
