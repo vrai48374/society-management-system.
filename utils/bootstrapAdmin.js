@@ -9,11 +9,11 @@ export async function ensureSuperAdmin() {
       return;
     }
 
-    const password = await bcrypt.hash("SuperSecret123", 10);
+    const password = await bcrypt.hash("123456", 10);
 
     const superAdmin = await User.create({
       name: "Super Admin",
-      email: "superadmin@example.com",
+      email: "vrai48374@gmail.com",
       password: password,
       role: "superadmin",
     });
