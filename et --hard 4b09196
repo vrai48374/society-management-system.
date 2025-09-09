@@ -1,0 +1,29 @@
+[33mbef32da[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m refactor: remove payment-info route and related schema fields from society model
+[33m51e041f[m refactor: remove payment-related routes, controller, and model
+[33m6ee687e[m feat: refactor payment model to society model and add payment-info route
+[33m4b09196[m feat: implement payment processing functionality with routes and models
+[33m2f28b86[m fix: update CORS configuration to include OPTIONS method and handle preflight requests
+[33m8a17493[m fix: update logout cookie settings to include sameSite and secure attributes fix: add methods to CORS configuration for better request handling
+[33mc07e977[m fix: update cookie settings to always use secure and none for sameSite
+[33mea6a002[m fix: add missing comma in CORS allowed origins
+[33m8062481[m fix: remove ensureSuperAdmin call from server startup
+[33m09262ef[m feat: add superadmin signup route to create a super admin user if none exists
+[33md8c0f8d[m feat: integrate ensureSuperAdmin function to create a super admin user if it doesn't exist
+[33meb88ce1[m fix: remove ensureSuperAdmin call from server startup
+[33me6ed3a9[m feat: add ensureSuperAdmin function to create a super admin user if it doesn't exist
+[33mb183d38[m fix: update CORS configuration to specify allowed origins for enhanced security
+[33m0e0be10[m fix: set trust proxy for express app to enhance security
+[33m820b001[m fix: update CORS configuration to allow requests from all origins
+[33mbc473bb[m fix: enable cors for netlify frontend
+[33m3cd7120[m Refactor block and flat deletion methods to use deleteOne for consistency; add delete routes for blocks and flats with admin authorization; update comments for clarity.
+[33m55ce718[m Enhance user authentication and management features; refactor login and registration processes to include society linkage; implement admin management routes and controllers; add dynamic issue priority handling; improve error handling and response structures across controllers.
+[33ma44adc5[m Refactor codebase by removing Razorpay integration and related payment functionality; update comments for consistency; enhance readability by standardizing comment styles across controllers and routes.
+[33m5845ccb[m Implement payment processing with Razorpay integration; add payment model, controllers, and routes; enhance flat creation with society linkage; improve error handling and logging in middleware.
+[33ma54d9b1[m Implement error handling middleware and validation for routes; add issue and ticket controllers and routes; enhance user, block, and flat models with unique constraints; update server configuration for new routes and middleware.
+[33m4003650[m Add getSocietyDetails endpoint to retrieve society with nested blocks, flats, and users; update routes for admin access
+[33m621a3df[m Enhance block and flat controllers with society linkage; update routes for improved data retrieval and error handling
+[33m42ebe60[m Refactor models and controllers for Blocks, Flats, and Societies; implement full linkage for users; add new routes for retrieving details with populated data.
+[33mf21f296[m Refactor auth and user controllers; rename logoutUser to logout and update user routes for consistency
+[33m6c3f13e[m Refactor user, flat, block, and society models; enhance user controller with full linkage assignment; update routes and middleware for improved role management and error handling.
+[33m539cbdc[m Implement user, block, and flat models with corresponding controllers and routes
+[33mb925007[m Initial commit
