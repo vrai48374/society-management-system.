@@ -88,7 +88,6 @@ const PORT = process.env.PORT || 5000;
 async function startServer() {
   try {
     await connectDB();
-    await ensureSuperAdmin();
     app.listen(PORT, () => {
       console.log(` Server running: http://localhost:${PORT}`);
     });
