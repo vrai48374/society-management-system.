@@ -22,7 +22,7 @@ import ticketRoutes from "./routes/ticket.routes.js";
 import issueRoutes from "./routes/issue.routes.js"; // issues
 import adminRoutes from "./routes/admin.routes.js";
 import { ensureSuperAdmin } from "./utils/bootstrapAdmin.js";
-
+import superadminRoutes from "./routes/superadminRoutes.js";
 // payment routes
 // import paymentRoutes from "./routes/payment.routes.js";
 
@@ -68,6 +68,7 @@ app.use("/api/flats", flatRoutes);          // flats
 app.use("/api/tickets", ticketRoutes);      // tickets
 app.use("/api/issues", issueRoutes);        // issues
 // app.use("/api/payments", paymentRoutes);  // payments
+app.use("/api", superadminRoutes);
 app.use("/api/admin", adminRoutes);
 
 // 🔹 404 handler
