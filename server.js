@@ -37,7 +37,8 @@ app.use(cors({
     "http://localhost:5500",
     "http://127.0.0.1:5500",
     "https://vrai48374.github.io",   // your GitHub Pages frontend
-    "https://cute-medovik-4edd9e.netlify.app" // keep if you test Netlify
+    "https://cute-medovik-4edd9e.netlify.app", // keep if you test Netlify
+    "https://vrai48374.github.io/society-frontend",
   ],
   credentials: true,
 }));
