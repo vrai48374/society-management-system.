@@ -40,6 +40,7 @@ app.use(cors({
     "https://cute-medovik-4edd9e.netlify.app", // keep if you test Netlify
     "https://vrai48374.github.io/society-frontend",
   ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 
