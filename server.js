@@ -26,7 +26,7 @@ import adminRoutes from "./routes/admin.routes.js";
 // import paymentRoutes from "./routes/payment.routes.js";
 
 const app = express();
-
+app.set("trust proxy", 1);
 // 🔹 Security & Performance Middlewares
 app.use(helmet());
 app.use(cors({
