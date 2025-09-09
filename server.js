@@ -21,7 +21,6 @@ import flatRoutes from "./routes/flat.routes.js";
 import ticketRoutes from "./routes/ticket.routes.js";
 import issueRoutes from "./routes/issue.routes.js"; // issues
 import adminRoutes from "./routes/admin.routes.js";
-import { ensureSuperAdmin } from "./utils/bootstrapAdmin.js";
 
 // payment routes
 // import paymentRoutes from "./routes/payment.routes.js";
@@ -87,10 +86,6 @@ const PORT = process.env.PORT || 5000;
 async function startServer() {
   try {
     await connectDB();
-
-    //  ensure super admin exists
-    await ensureSuperAdmin();
-
     app.listen(PORT, () => {
       console.log(` Server running: http://localhost:${PORT}`);
     });
