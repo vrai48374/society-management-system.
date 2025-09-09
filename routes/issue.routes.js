@@ -21,6 +21,8 @@ router.get("/me", protect, authorize("resident"), getMyIssues);
 // Admin/Superadmin: View all issues//done
 router.get("/", protect, authorize("admin", "superadmin"), getAllIssues);
 
+router.delete("/clear-old", clearOldIssues);
+
 // Admin/Superadmin: Update issue status
 router.put("/:id/status", protect, authorize("admin", "superadmin"), updateIssueStatus);
 
@@ -29,6 +31,5 @@ router.put("/:id/resolve", protect, authorize("admin", "superadmin"), resolveIss
 
 // Resident (who raised) OR Admin/Superadmin: Close issue
 router.put("/:id/close", protect, authorize("resident", "admin", "superadmin"), closeIssue);
-router.delete("/clear-old", clearOldIssues);
 
 export default router;

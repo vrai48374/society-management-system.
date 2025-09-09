@@ -18,14 +18,12 @@ import { createSociety } from "../controllers/society.controller.js";
 
 const router = express.Router();
 
+// ---------------- STATIC ROUTES FIRST ---------------- //
 
-// Resident
+// Resident: Get own profile
 router.get("/me", protect, getMyProfile);
 
-// Admin - Get all users
-router.get("/", protect, authorize("admin"), getAllUsers);
-
-// Admin/Superadmin - Create user
+// Admin/Superadmin: Create user
 router.post(
   "/",
   protect,
@@ -41,6 +39,33 @@ router.post(
   createUser
 );
 
+// Assign user to flat
+router.post(
+  "/assign",
+  protect,
+  authorize("superadmin", "admin"),
+  [
+    body("userId").isMongoId().withMessage("Valid userId is required"),
+    body("flatId").isMongoId().withMessage("Valid flatId is required"),
+  ],
+  validate,
+  assignUserFullLinkage
+);
+
+// Only superadmin can create society
+router.post(
+  "/create",
+  protect,
+  authorize("superadmin"),
+  [body("name").notEmpty().withMessage("Society name is required")],
+  validate,
+  createSociety
+);
+
+// Admin - Get all users
+router.get("/", protect, authorize("admin"), getAllUsers);
+
+// ---------------- DYNAMIC ROUTES AFTER ---------------- //
 
 // Update user
 router.put(
@@ -76,19 +101,6 @@ router.get(
   getUserById
 );
 
-// Assign user to flat
-router.post(
-  "/assign",
-  protect,
-  authorize("superadmin", "admin"),
-  [
-    body("userId").isMongoId().withMessage("Valid userId is required"),
-    body("flatId").isMongoId().withMessage("Valid flatId is required"),
-  ],
-  validate,
-  assignUserFullLinkage
-);
-
 // Get user with full linkage
 router.get(
   "/:id/full",
@@ -97,16 +109,6 @@ router.get(
   [param("id").isMongoId().withMessage("Invalid user ID")],
   validate,
   getUserFullDetails
-);
-
-// Only superadmin can create society
-router.post(
-  "/create",
-  protect,
-  authorize("superadmin"),
-  [body("name").notEmpty().withMessage("Society name is required")],
-  validate,
-  createSociety
 );
 
 export default router;
