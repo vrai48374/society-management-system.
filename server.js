@@ -31,10 +31,16 @@ app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors({
   origin: [
-    "0.0.0.0"
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://vrai48374.github.io",   // your GitHub Pages frontend
+    "https://cute-medovik-4edd9e.netlify.app" // keep if you test Netlify
   ],
   credentials: true,
 }));
+
 
 app.use(compression());
 app.use(express.json({ limit: "10mb" }));
