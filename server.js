@@ -36,13 +36,18 @@ app.use(cors({
     "http://127.0.0.1:3000",
     "http://localhost:5500",
     "http://127.0.0.1:5500",
-    "https://vrai48374.github.io",   // your GitHub Pages frontend
-    "https://cute-medovik-4edd9e.netlify.app", // keep if you test Netlify
+    "https://vrai48374.github.io",
     "https://vrai48374.github.io/society-frontend",
+    "https://cute-medovik-4edd9e.netlify.app",
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
+
+// Handle preflight (OPTIONS) globally
+app.options("*", cors());
+
 
 
 app.use(compression());
