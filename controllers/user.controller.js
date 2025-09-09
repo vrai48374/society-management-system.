@@ -7,6 +7,7 @@ import Society from "../models/Society.js";
 
 // Get logged-in user profile
 // controllers/user.controller.js
+// done 
 export const getMyProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id)
@@ -45,6 +46,7 @@ export const getUserById = async (req, res) => {
 };
 
 // Create user (admin/superadmin)
+// done
 export const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -56,13 +58,38 @@ export const createUser = async (req, res) => {
 };
 
 // Update user (admin only)
-export const updateUser = async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if (!user) return res.status(404).json({ message: "User not found" });
-  res.status(200).json(user);
-};
+// done
+import bcrypt from 'bcryptjs';
 
+export const updateUser = async (req, res) => {
+  try {
+    const { password, ...restOfBody } = req.body;
+    let updateFields = { ...restOfBody };
+
+    // Check if a password is being updated
+    if (password) {
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      updateFields.password = hashedPassword;
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Exclude the password from the response
+    const { password: userPassword, ...userData } = user._doc;
+
+    res.status(200).json({ success: true, data: userData });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+  }
+};
 // Delete user (admin only)
+// done
 export const deleteUser = async (req, res) => {
   const user = await User.findByIdAndDelete(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
@@ -70,7 +97,7 @@ export const deleteUser = async (req, res) => {
 };
 
 //  FULL LINKAGE FUNCTION 
-
+//done
 export const assignUserFullLinkage = async (req, res) => {
   try {
     const { userId, flatId } = req.body;

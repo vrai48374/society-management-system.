@@ -135,19 +135,22 @@ export const deleteFlat = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Flat not found" });
     }
 
-    // Restrict admin to their assigned society
-    if (req.user.role === "admin" && req.user.assignedSociety.toString() !== flat.block.society.toString()) {
-      return res.status(403).json({ success: false, message: "Admins can only manage their own society" });
+    // Check if flat.block is not null before accessing its properties
+    if (flat.block) {
+      // Restrict admin to their assigned society
+      if (req.user.role === "admin" && req.user.assignedSociety.toString() !== flat.block.society.toString()) {
+        return res.status(403).json({ success: false, message: "Admins can only manage their own society" });
+      }
+
+      // Remove flat reference from block
+      const block = await Block.findById(flat.block._id);
+      if (block) {
+        block.flats = block.flats.filter(fId => fId.toString() !== flat._id.toString());
+        await block.save();
+      }
     }
 
-    // Remove flat reference from block
-    const block = await Block.findById(flat.block._id);
-    if (block) {
-      block.flats = block.flats.filter(fId => fId.toString() !== flat._id.toString());
-      await block.save();
-    }
-
-    await flat.remove();
+    await flat.deleteOne();
 
     res.status(200).json({ success: true, message: "Flat deleted successfully" });
   } catch (err) {

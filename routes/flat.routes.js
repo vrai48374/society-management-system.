@@ -1,6 +1,6 @@
 import express from "express";
 import { protect, authorize } from "../middleware/authMiddleware.js";
-import { createFlat, getFlatsByBlock,getFlatsBySociety, } from "../controllers/flat.controller.js";
+import { createFlat, getFlatsByBlock,getFlatsBySociety, deleteFlat} from "../controllers/flat.controller.js";
 
 const router = express.Router();
 
@@ -12,5 +12,7 @@ router.get("/:blockId", protect, getFlatsByBlock);
 
 //  Get flats with 
 router.get("/society/:societyId", protect, getFlatsBySociety);
+//  Delete Flat (Admin only)
+router.delete("/:id", protect, authorize("admin", "superadmin"), deleteFlat);
 
 export default router;

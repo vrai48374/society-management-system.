@@ -131,7 +131,7 @@ export const deleteBlock = async (req, res, next) => {
       await society.save();
     }
 
-    await block.remove();
+    await block.deleteOne();
 
     res.status(200).json({ success: true, message: "Block deleted successfully" });
   } catch (err) {

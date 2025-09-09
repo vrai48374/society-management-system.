@@ -12,13 +12,13 @@ import { protect, authorize } from "../middleware/authMiddleware.js";
 import { clearOldIssues } from "../controllers/issue.controller.js";
 const router = express.Router();
 
-// Resident: Raise an issue
+// Resident: Raise an issue//done
 router.post("/", protect, authorize("resident", "admin", "superadmin"), createIssue);
 
-// Resident: View my issues
+// Resident: View my issues//done
 router.get("/me", protect, authorize("resident"), getMyIssues);
 
-// Admin/Superadmin: View all issues
+// Admin/Superadmin: View all issues//done
 router.get("/", protect, authorize("admin", "superadmin"), getAllIssues);
 
 // Admin/Superadmin: Update issue status
