@@ -1,10 +1,11 @@
 import Issue from "../models/Issue.js";
 import Flat from "../models/Flat.js";
+import { getDynamicPriority } from "../utils/priority.js";
 
 // Create Issue (Resident)
 export const createIssue = async (req, res) => {
   try {
-    const { title, description, flatId } = req.body; // 🚨 removed priority from body
+    const { title, description, flatId } = req.body;
 
     const flat = await Flat.findById(flatId).populate("block");
     if (!flat) {
@@ -14,7 +15,7 @@ export const createIssue = async (req, res) => {
     const issue = await Issue.create({
       title,
       description,
-      priority: "normal", // 🚀 always start as normal
+      priority: "normal",
       raisedBy: req.user._id,
       flat: flat._id,
       block: flat.block._id,
@@ -27,13 +28,15 @@ export const createIssue = async (req, res) => {
   }
 };
 
-
-import { getDynamicPriority } from "../utils/priority.js";
-
 // Get all Issues (Admin/Superadmin)
 export const getAllIssues = async (req, res) => {
   try {
-    const issues = await Issue.find()
+    let query = {};
+    if (req.user.role === 'admin') {
+      query.society = req.user.assignedSociety;
+    }
+
+    const issues = await Issue.find(query)
       .populate("raisedBy", "name email")
       .populate("flat", "number")
       .populate("block", "name")
@@ -41,7 +44,7 @@ export const getAllIssues = async (req, res) => {
 
     const updated = issues.map(i => ({
       ...i.toObject(),
-      priority: getDynamicPriority(i), // auto escalation
+      priority: getDynamicPriority(i),
     }));
 
     res.status(200).json({ success: true, data: updated });
@@ -68,7 +71,6 @@ export const getMyIssues = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 // Update Issue Status (Generic Admin Update)
 export const updateIssueStatus = async (req, res) => {
@@ -131,10 +133,11 @@ export const closeIssue = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
 // in issue.controller.js
 export const clearOldIssues = async (req,res)=>{
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate()-30); // 30 days ago
+  cutoff.setDate(cutoff.getDate()-30);
   await Issue.deleteMany({ createdAt: { $lt: cutoff } });
   res.json({ success:true, message:"Old issues cleared" });
 };
