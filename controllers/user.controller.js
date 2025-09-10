@@ -77,12 +77,15 @@ import bcrypt from 'bcryptjs';
 
 export const updateUser = async (req, res) => {
   try {
+    // Residents can only update themselves
+    if (req.user.role === "resident" && req.user._id.toString() !== req.params.id) {
+      return res.status(403).json({ success: false, message: "Unauthorized to update this user" });
+    }
+
     const { password, ...restOfBody } = req.body;
     let updateFields = { ...restOfBody };
 
-    // Check if a password is being updated
     if (password) {
-      // Hash the new password
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       updateFields.password = hashedPassword;
@@ -94,7 +97,6 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Exclude the password from the response
     const { password: userPassword, ...userData } = user._doc;
 
     res.status(200).json({ success: true, data: userData });
@@ -102,6 +104,7 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
+
 // Delete user (admin only)
 // done
 export const deleteUser = async (req, res) => {

@@ -71,7 +71,7 @@ router.get("/", protect, authorize("admin"), getAllUsers);
 router.put(
   "/:id",
   protect,
-  authorize("admin"),
+  authorize("admin","resident"),
   [
     param("id").isMongoId().withMessage("Invalid user ID"),
     body("name").optional().notEmpty().withMessage("Name cannot be empty"),
