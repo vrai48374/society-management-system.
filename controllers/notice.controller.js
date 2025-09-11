@@ -20,7 +20,7 @@ export const createNotice = async (req, res, next) => {
       society: societyId 
     }).select("email");
 
-    // (remaining code unchanged)
+    
   } catch (err) {
     next(err);
   }
