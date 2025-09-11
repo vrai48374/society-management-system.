@@ -23,7 +23,7 @@
   import adminRoutes from "./routes/admin.routes.js";
   import { ensureSuperAdmin } from "./utils/bootstrapAdmin.js";
   import superadminRoutes from "./routes/superadminRoutes.js";
-
+  import noticeroutes from "./routes/notice.routes.js";
 
   const app = express();
   app.set("trust proxy", 1);
@@ -75,7 +75,7 @@
 
   app.use("/api", superadminRoutes);
   app.use("/api/admin", adminRoutes);
-
+  app.use("/api/notice",noticeroutes);
   // 🔹 404 handler
   app.use((req, res, next) => {
     res.status(404).json({
