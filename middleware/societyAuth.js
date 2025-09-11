@@ -9,7 +9,7 @@ export const authorizeSocietyAdmin = async (req, res, next) => {
     }
 
     // Check if user is admin of the target society
-    if (req.user.role === "admin" && req.user.society.toString() === societyId) {
+    if (req.user.role === "admin" && req.user.flat.block.society.toString() === societyId) {
       return next();
     }
 
