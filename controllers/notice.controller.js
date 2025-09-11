@@ -15,12 +15,47 @@ export const createNotice = async (req, res, next) => {
       });
     }
 
+    // Fetch residents of the society (role 'resident') and get their _id and email
     const residents = await User.find({ 
       role: "resident", 
       society: societyId 
-    }).select("email");
+    }).select("_id email");
 
-    
+    // Extract resident IDs for the notice
+    const residentIds = residents.map(resident => resident._id);
+
+    // Create the notice
+    const notice = new Notice({
+      title,
+      message,
+      society: societyId,
+      createdBy: req.user._id,
+      sendTo: residentIds,
+      createdAt: new Date()
+    });
+
+    await notice.save();
+    // Populate the createdBy field with name and email
+    await notice.populate('createdBy', 'name email');
+
+    // Send emails to each resident
+    residents.forEach(resident => {
+      sendEmail({
+        to: resident.email,
+        subject: `Notice: ${title}`,
+        text: message,
+        html: `<p>${message}</p>`
+      }).catch(error => {
+        console.error(`Failed to send email to ${resident.email}:`, error);
+      });
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Notice created and sent successfully",
+      data: notice
+    });
+
   } catch (err) {
     next(err);
   }
