@@ -9,11 +9,13 @@ export const transporter = nodemailer.createTransport({
 });
 
 // Function to send email
-export const sendEmail = async (to, subject, text) => {
+// REPLACE IT WITH THIS NEW FUNCTION
+export const sendEmail = async (options) => {
   await transporter.sendMail({
     from: `"Society Admin" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
+    to: options.to,
+    subject: options.subject,
+    text: options.text,
+    html: options.html, // This also adds support for HTML emails
   });
 };
