@@ -1,8 +1,5 @@
-// middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-
-
 
 export const protect = async (req, res, next) => {
   try {
@@ -13,28 +10,31 @@ export const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findById(decoded.id)
+    // Fetch the user and populate both the direct and nested paths for the society
+    const user = await User.findById(decoded.id)
       .select("-password")
-      .populate({
+      .populate('assignedSociety') // Path for Admins
+      .populate({                 // Path for Residents
         path: "flat",
         populate: {
           path: "block",
           populate: {
-            path: "society",
-            select: "name address"
+            path: "society"
           },
-          select: "name"
         },
-        select: "number"
       });
 
-    if (!req.user) {
-      return res.status(401).json({ success: false, message: "User not found, token invalid" });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "User not found" });
     }
-
+    
+    // This one line now handles both Admins and Residents
+    // It creates a new 'society' property on the user object for easy access
+    user.society = user.assignedSociety || user.flat?.block?.society;
+    
+    req.user = user;
     next();
   } catch (error) {
-    console.error("Token verification failed:", error.message);
     res.status(401).json({ success: false, message: "Not authorized, token failed" });
   }
 };
