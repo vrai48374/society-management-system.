@@ -19,7 +19,7 @@ export const authorizeSocietyAdmin = (req, res, next) => {
       });
     }
     
-    // THE FIX IS ON THIS LINE 👇
+    
     // Compare the user's nested society ID with the one from the request
     if (req.user.flat.block.society._id.toString() !== societyId) {
       return res.status(403).json({
