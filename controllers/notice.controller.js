@@ -1,9 +1,9 @@
+import mongoose from "mongoose";
 import Notice from "../models/Notice.js";
 import User from "../models/User.js";
 import { sendEmail } from "../utils/email.js";
 
 // controllers/notice.controller.js
-// In controllers/notice.controller.js
 export const createNotice = async (req, res, next) => {
   try {
     const { title, message, societyId } = req.body;
@@ -23,45 +23,17 @@ export const createNotice = async (req, res, next) => {
       }
     }
 
-    // NEW: Find residents through the flat-block-society hierarchy
-    const residents = await User.aggregate([
-      {
-        $match: {
-          role: "resident",
-          flat: { $exists: true, $ne: null } // Only users with a flat
+    // Simplified approach using Mongoose population
+    const residents = await User.find({ role: "resident" })
+      .populate({
+        path: "flat",
+        populate: {
+          path: "block",
+          match: { society: societyId },
+          select: "society"
         }
-      },
-      {
-        $lookup: {
-          from: "flats",
-          localField: "flat",
-          foreignField: "_id",
-          as: "flatData"
-        }
-      },
-      { $unwind: "$flatData" },
-      {
-        $lookup: {
-          from: "blocks",
-          localField: "flatData.block",
-          foreignField: "_id",
-          as: "blockData"
-        }
-      },
-      { $unwind: "$blockData" },
-      {
-        $match: {
-          "blockData.society": new mongoose.Types.ObjectId(societyId)
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          email: 1,
-          name: 1
-        }
-      }
-    ]);
+      })
+      .then(users => users.filter(user => user.flat && user.flat.block));
 
     console.log(`Found ${residents.length} residents for society ${societyId}`);
 
