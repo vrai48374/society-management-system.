@@ -19,12 +19,21 @@ transporter.verify(function (error, success) {
 
 // Function to send email
 // REPLACE IT WITH THIS NEW FUNCTION
+// Update your sendEmail function
 export const sendEmail = async (options) => {
-  await transporter.sendMail({
-    from: `"Society Admin" <${process.env.EMAIL_USER}>`,
-    to: options.to,
-    subject: options.subject,
-    text: options.text,
-    html: options.html, // This also adds support for HTML emails
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: `"Society Admin" <${process.env.EMAIL_USER}>`,
+      to: options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+    });
+    
+    console.log(`Email sent to ${options.to}:`, info.messageId);
+    return info;
+  } catch (error) {
+    console.error(`Failed to send email to ${options.to}:`, error);
+    throw error;
+  }
 };

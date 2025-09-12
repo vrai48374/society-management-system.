@@ -63,6 +63,7 @@ export const createNotice = async (req, res, next) => {
 
     // Wait for all emails to be sent (or fail)
     await Promise.allSettled(emailPromises);
+console.log("Attempting to send emails to:", residents.map(r => r.email));
 
     res.status(201).json({
       success: true,
