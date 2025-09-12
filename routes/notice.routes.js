@@ -1,7 +1,7 @@
 // In your routes file (e.g., routes/notice.js)
 import express from "express";
 import { createNotice, getNoticesBySociety } from "../controllers/notice.controller.js";
-import { protect } from "../middleware/auth.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
