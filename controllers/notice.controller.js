@@ -8,9 +8,8 @@ export const createNotice = async (req, res, next) => {
   try {
     const { title, message, societyId } = req.body;
 
-    // Verify user has permissions for this society - UPDATED CODE
+    // Verify user has permissions for this society
     if (req.user.role !== "superadmin") {
-      // Handle both populated society object and raw society ID
       const userSocietyId = 
         req.user.society?._id ? 
         req.user.society._id.toString() : 
@@ -24,23 +23,58 @@ export const createNotice = async (req, res, next) => {
       }
     }
 
-    // Fetch residents of the society (role 'resident') and get their _id and email
+    // Fetch residents of the society
     const residents = await User.find({ 
       role: "resident", 
       society: societyId 
     }).select("_id email");
 
+    // Extract resident IDs for the notice
+    const residentIds = residents.map(resident => resident._id);
 
-console.log("User role:", req.user.role);
-console.log("User society:", req.user.society);
-console.log("Request societyId:", societyId);
-console.log("Type of user society:", typeof req.user.society);
-console.log("Type of request societyId:", typeof societyId);
+    // Create the notice
+    const notice = new Notice({
+      title,
+      message,
+      society: societyId,
+      createdBy: req.user._id,
+      sendTo: residentIds,
+      createdAt: new Date()
+    });
+
+    await notice.save();
+    await notice.populate('createdBy', 'name email');
+
+    // Send emails with better error handling
+    const emailPromises = residents.map(async (resident) => {
+      try {
+        await sendEmail({
+          to: resident.email,
+          subject: `Notice: ${title}`,
+          text: message,
+          html: `<p>${message}</p>`
+        });
+        console.log(`Email sent to ${resident.email}`);
+      } catch (error) {
+        console.error(`Failed to send email to ${resident.email}:`, error);
+        // Don't throw error here to prevent failing the whole operation
+      }
+    });
+
+    // Wait for all emails to be sent (or fail)
+    await Promise.allSettled(emailPromises);
+
+    res.status(201).json({
+      success: true,
+      message: "Notice created and sent successfully",
+      data: notice
+    });
+
   } catch (err) {
+    console.error("Error in createNotice:", err);
     next(err);
   }
 };
-
 // Get all notices for a society
 export const getNoticesBySociety = async (req, res, next) => {
   try {

@@ -8,6 +8,15 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log("Transporter error:", error);
+  } else {
+    console.log("Server is ready to send emails");
+  }
+});
+
+
 // Function to send email
 // REPLACE IT WITH THIS NEW FUNCTION
 export const sendEmail = async (options) => {

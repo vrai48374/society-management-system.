@@ -76,6 +76,16 @@
   app.use("/api", superadminRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/notice",noticeroutes);
+  // In your server setup (app.js or server.js)
+app.use((req, res, next) => {
+  req.setTimeout(30000, () => { // 30 seconds timeout
+    res.status(408).json({ success: false, message: "Request timeout" });
+  });
+  res.setTimeout(30000, () => {
+    console.log("Response timeout");
+  });
+  next();
+});
   // 🔹 404 handler
   app.use((req, res, next) => {
     res.status(404).json({
