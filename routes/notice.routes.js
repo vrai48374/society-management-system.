@@ -1,15 +1,12 @@
+// In your routes file (e.g., routes/notice.js)
 import express from "express";
 import { createNotice, getNoticesBySociety } from "../controllers/notice.controller.js";
-import { protect, authorize } from "../middleware/authMiddleware.js";
-import { authorizeSocietyAdmin } from "../middleware/societyAuth.js";
-
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Only admin/superadmin can create notice
-router.post("/", protect, authorizeSocietyAdmin, createNotice);
-
-// Residents & Admin can view notices
-router.get("/:societyId", protect, getNoticesBySociety);
+// This route should use the protect middleware
+router.post("/", protect, createNotice);
+router.get("/society/:societyId", protect, getNoticesBySociety);
 
 export default router;

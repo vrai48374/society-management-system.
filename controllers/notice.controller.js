@@ -3,16 +3,25 @@ import User from "../models/User.js";
 import { sendEmail } from "../utils/email.js";
 
 // controllers/notice.controller.js
+// In controllers/notice.controller.js
 export const createNotice = async (req, res, next) => {
   try {
     const { title, message, societyId } = req.body;
 
-    // Verify user has permissions for this society
-    if (req.user.role !== "superadmin" && req.user.society.toString() !== societyId) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to create notices for this society"
-      });
+    // Verify user has permissions for this society - UPDATED CODE
+    if (req.user.role !== "superadmin") {
+      // Handle both populated society object and raw society ID
+      const userSocietyId = 
+        req.user.society?._id ? 
+        req.user.society._id.toString() : 
+        req.user.society?.toString();
+      
+      if (userSocietyId !== societyId) {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized to create notices for this society"
+        });
+      }
     }
 
     // Fetch residents of the society (role 'resident') and get their _id and email
@@ -21,41 +30,12 @@ export const createNotice = async (req, res, next) => {
       society: societyId 
     }).select("_id email");
 
-    // Extract resident IDs for the notice
-    const residentIds = residents.map(resident => resident._id);
 
-    // Create the notice
-    const notice = new Notice({
-      title,
-      message,
-      society: societyId,
-      createdBy: req.user._id,
-      sendTo: residentIds,
-      createdAt: new Date()
-    });
-
-    await notice.save();
-    // Populate the createdBy field with name and email
-    await notice.populate('createdBy', 'name email');
-
-    // Send emails to each resident
-    residents.forEach(resident => {
-      sendEmail({
-        to: resident.email,
-        subject: `Notice: ${title}`,
-        text: message,
-        html: `<p>${message}</p>`
-      }).catch(error => {
-        console.error(`Failed to send email to ${resident.email}:`, error);
-      });
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Notice created and sent successfully",
-      data: notice
-    });
-
+console.log("User role:", req.user.role);
+console.log("User society:", req.user.society);
+console.log("Request societyId:", societyId);
+console.log("Type of user society:", typeof req.user.society);
+console.log("Type of request societyId:", typeof societyId);
   } catch (err) {
     next(err);
   }
