@@ -7,6 +7,8 @@ const router = express.Router();
 
 // This route should use the protect middleware
 router.post("/", protect, createNotice);
+router.get("/:societyId", protect, getNoticesBySociety);
+
 router.get("/society/:societyId", protect, getNoticesBySociety);
 
 export default router;
