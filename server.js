@@ -39,6 +39,7 @@
       "https://vrai48374.github.io/society-frontend",
       "https://cute-medovik-4edd9e.netlify.app",
       "http://mysystem.live/index.html",
+      "https://mysystem.live/index.html",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
