@@ -24,6 +24,8 @@
   import { ensureSuperAdmin } from "./utils/bootstrapAdmin.js";
   import superadminRoutes from "./routes/superadminRoutes.js";
   import noticeroutes from "./routes/notice.routes.js";
+  import feeRoutes from "./routes/feeRoutes.js";
+  import paymentRoutes from "./routes/paymentRoutes.js";
 
   const app = express();
   app.set("trust proxy", 1);
@@ -78,6 +80,9 @@
   app.use("/api", superadminRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/notice",noticeroutes);
+
+  app.use("/api/fees", feeRoutes);//fee
+  app.use("/api/payments", paymentRoutes);//payment
   // In your server setup (app.js or server.js)
 app.use((req, res, next) => {
   req.setTimeout(30000, () => { // 30 seconds timeout
