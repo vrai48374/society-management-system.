@@ -9,6 +9,8 @@ import {
   updateAdmin, 
   deleteAdmin 
 } from "../controllers/admin.controller.js";
+import {  adminOnly } from "../middleware/authMiddleware.js";
+import { updateUserBalance } from "../controllers/adminController.js";
 
 const router = express.Router();
 
