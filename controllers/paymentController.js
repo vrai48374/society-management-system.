@@ -3,12 +3,6 @@ import Payment from "../models/Payment.js";
 import Fee from "../models/Fee.js";
 import User from "../models/User.js";
 
-// Record a payment
-// controllers/paymentController.js
-import Payment from "../models/Payment.js";
-import Fee from "../models/Fee.js";
-import User from "../models/User.js";
-
 export const recordPayment = async (req, res) => {
   try {
     const { userId, flatId, feeId, amount, paymentMethod, transactionId } = req.body;
