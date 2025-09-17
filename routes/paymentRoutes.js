@@ -5,7 +5,8 @@ import {
   getPayments,
   getPaymentById,
   getUserPayments,
-  updatePaymentStatus
+  updatePaymentStatus,
+  getMyPayments,
 } from "../controllers/paymentController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
