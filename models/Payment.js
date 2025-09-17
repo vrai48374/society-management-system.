@@ -35,9 +35,11 @@ const paymentSchema = new mongoose.Schema({
     enum: ["upi", "net_banking", "cash", "card"],
     required: true
   },
-  transactionId: {
+  transactionId: { 
     type: String,
-    required: true
+    required: function () {
+      return this.paymentMethod !== "cash"; 
+    } 
   },
   recordedBy: {
     type: mongoose.Schema.Types.ObjectId,
