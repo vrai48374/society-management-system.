@@ -12,7 +12,7 @@ import {
   getUserById,
   getUserFullDetails,
 } from "../controllers/user.controller.js";
-import { getMyBalance } from "../controllers/userController.js";
+import { getMyBalance } from "../controllers/user.controller.js";
 
 
 import { protect, authorize } from "../middleware/authMiddleware.js";
