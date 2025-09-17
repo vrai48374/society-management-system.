@@ -16,5 +16,6 @@ router.get("/", protect, getPayments);
 router.get("/user", protect, getUserPayments);
 router.get("/:paymentId", protect, getPaymentById);
 router.patch("/:paymentId/status", protect, authorize("admin", "superadmin"), updatePaymentStatus);
-
+router.post("/record", protect, recordPayment);
+router.get("/my-payments", protect, getMyPayments);
 export default router;

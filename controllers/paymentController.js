@@ -4,27 +4,18 @@ import Fee from "../models/Fee.js";
 import User from "../models/User.js";
 
 // Record a payment
+// controllers/paymentController.js
+import Payment from "../models/Payment.js";
+import Fee from "../models/Fee.js";
+import User from "../models/User.js";
+
 export const recordPayment = async (req, res) => {
   try {
     const { userId, flatId, feeId, amount, paymentMethod, transactionId } = req.body;
-    
-    // Check if user is admin or superadmin
-    if (req.user.role !== "admin" && req.user.role !== "superadmin") {
-      return res.status(403).json({ success: false, message: "Access denied. Admin rights required." });
-    }
-    
-    // Verify fee exists
+
     const fee = await Fee.findById(feeId);
-    if (!fee) {
-      return res.status(404).json({ success: false, message: "Fee not found" });
-    }
-    
-    // Verify user exists
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-    
+    if (!fee) return res.status(404).json({ success: false, message: "Fee not found" });
+
     const payment = new Payment({
       user: userId,
       flat: flatId,
@@ -33,24 +24,28 @@ export const recordPayment = async (req, res) => {
       amount,
       paymentMethod,
       transactionId,
-      recordedBy: req.user.id
+      recordedBy: req.user.id,
+      status: "completed",
+      dueDate: fee.dueDate
     });
-    
+
     await payment.save();
-    
-    // Populate the payment details for response
-    await payment.populate("fee user recordedBy");
-    
-    res.status(201).json({ 
+
+    // ✅ Populate for both dashboards
+    const populatedPayment = await Payment.findById(payment._id)
+      .populate("fee", "name amount")
+      .populate("user", "name email");
+
+    res.status(201).json({
       success: true,
-      message: "Payment recorded successfully", 
-      payment,
-      receiptNumber: payment.receiptNumber
+      message: "Payment recorded successfully",
+      payment: populatedPayment
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 // Get all payments with filters
 export const getPayments = async (req, res) => {
@@ -157,5 +152,17 @@ export const updatePaymentStatus = async (req, res) => {
     res.status(200).json({ success: true, message: "Payment status updated successfully", payment });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+// controllers/paymentController.js
+export const getMyPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({ user: req.user._id })
+      .populate("fee", "name amount")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, payments });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };

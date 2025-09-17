@@ -110,5 +110,5 @@ router.get(
   validate,
   getUserFullDetails
 );
-
+router.get("/my-balance", protect, getMyBalance);
 export default router;

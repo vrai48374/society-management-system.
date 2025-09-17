@@ -213,3 +213,19 @@ export const getAllUsers = async (req, res, next) => {
 };
 
 
+export const getMyBalance = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("currentBalance dueDate");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      balance: user.currentBalance,
+      dueDate: user.dueDate
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

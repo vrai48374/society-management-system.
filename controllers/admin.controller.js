@@ -75,3 +75,32 @@ export const deleteAdmin = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateUserBalance = async (req, res) => {
+  try {
+    const { userId, balance, dueDate } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.currentBalance = balance;
+    user.dueDate = dueDate;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Balance updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        currentBalance: user.currentBalance,
+        dueDate: user.dueDate
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

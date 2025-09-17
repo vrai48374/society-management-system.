@@ -55,5 +55,6 @@ router.delete(
   validate,
   deleteAdmin
 );
+router.put("/update-balance", protect, adminOnly, updateUserBalance);
 
 export default router;
