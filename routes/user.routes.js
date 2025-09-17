@@ -12,6 +12,8 @@ import {
   getUserById,
   getUserFullDetails,
 } from "../controllers/user.controller.js";
+import { getMyBalance } from "../controllers/userController.js";
+
 
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import { createSociety } from "../controllers/society.controller.js";
