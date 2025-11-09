@@ -17,6 +17,7 @@
   "author": "vaibhav rai",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
@@ -31,7 +32,8 @@
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.6",
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
+    "resend": "^6.4.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
