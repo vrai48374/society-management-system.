@@ -1,7 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import { validate } from "../middleware/validateMiddleware.js";
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 import { 
   createAdmin, 
