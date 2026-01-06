@@ -9,7 +9,8 @@ import {
   getSocietyDetails,
 } from "../controllers/society.controller.js";
 
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
+
 
 const router = express.Router();
 
