@@ -8,7 +8,7 @@ import {
   resolveIssue,
   closeIssue,
 } from "../controllers/issue.controller.js";
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 import { clearOldIssues } from "../controllers/issue.controller.js";
 const router = express.Router();
 

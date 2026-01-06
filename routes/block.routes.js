@@ -1,5 +1,5 @@
 import express from "express";
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 import { createBlock, getBlocksBySociety,getBlockWithFlats, deleteBlock} from "../controllers/block.controller.js";
 
 const router = express.Router();
