@@ -1,30 +1,59 @@
-// middleware/societyAuth.js
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-export const authorizeSocietyAdmin = (req, res, next) => {
+// 🔐 Protect middleware
+export const protect = async (req, res, next) => {
+  try {
+    const token = req.cookies?.token;
 
-  // Superadmin can access everything
-  if (req.user.role === "superadmin") {
-    return next();
-  }
-
-  // Admin access
-  if (req.user.role === "admin") {
-
-    if (!req.user.society) {
-      return res.status(403).json({
+    if (!token) {
+      return res.status(401).json({
         success: false,
-        message: "Admin is not assigned to any society"
+        message: "Not authorized, no token"
       });
     }
 
-    // Lock admin to his society
-    req.society = req.user.society;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id)
+      .select("-password")
+      .populate("assignedSociety")
+      .populate({
+        path: "flat",
+        populate: {
+          path: "block",
+          populate: { path: "society" }
+        }
+      });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Attach society
+    user.society = user.assignedSociety || user.flat?.block?.society;
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Not authorized, token failed"
+    });
+  }
+};
+
+// 🔒 Admin-only middleware  ✅ THIS WAS MISSING
+export const adminOnly = (req, res, next) => {
+  if (req.user && (req.user.role === "admin" || req.user.role === "superadmin")) {
     return next();
   }
 
-  // Others (resident etc.)
   return res.status(403).json({
     success: false,
-    message: "Access denied"
+    message: "Access denied. Admins only."
   });
 };
