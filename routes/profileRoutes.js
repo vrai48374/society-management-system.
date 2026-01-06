@@ -1,5 +1,5 @@
 import express from "express";
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ router.get("/profile", protect, (req, res) => {
 });
 
 // Admin-only route
-router.get("/admin", protect, authorize("admin"), (req, res) => {
+router.get("/admin", protect, adminOnly, (req, res) => {
   res.json({ success: true, message: "Welcome, Admin!" });
 });
 
