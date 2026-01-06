@@ -1,11 +1,12 @@
 import express from "express";
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 import { createFlat, getFlatsByBlock,getFlatsBySociety, deleteFlat} from "../controllers/flat.controller.js";
 
 const router = express.Router();
 
 //  Create Flat (Admin only)
-router.post("/", protect, authorize("admin", "superadmin"), createFlat);
+router.post("/", protect, adminOnly, createFlat);
+
 
 //  Get flats with 
 router.get("/society/:societyId", protect, getFlatsBySociety);
