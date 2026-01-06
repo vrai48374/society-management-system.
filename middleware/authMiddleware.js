@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-// 🔐 Protect middleware
+//  Protect middleware
 export const protect = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
@@ -46,7 +46,7 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// 🔒 Admin-only middleware  ✅ THIS WAS MISSING
+//  Admin-only middleware
 export const adminOnly = (req, res, next) => {
   if (req.user && (req.user.role === "admin" || req.user.role === "superadmin")) {
     return next();
