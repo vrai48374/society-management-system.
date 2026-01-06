@@ -1,25 +1,31 @@
 import express from "express";
-import { 
-  createSociety, 
-  getAllSocieties, 
-  getSocietyById, 
-  updateSociety, 
-  deleteSociety ,
+import {
+  createSociety,
+  getAllSocieties,
+  getSocietyById,
+  updateSociety,
+  deleteSociety,
   getSocietyWithBlocks,
   getSocietyDetails,
 } from "../controllers/society.controller.js";
 
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
-
+import {
+  protect,
+  adminOnly,
+  superAdminOnly
+} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Only super admin can manage societies
-router.post("/", protect, authorize("superadmin"), createSociety);
-router.get("/", protect, authorize("superadmin"), getAllSocieties);
-router.get("/:id", protect, authorize("superadmin"), getSocietyById);
-router.put("/:id", protect, authorize("superadmin"), updateSociety);
-router.delete("/:id", protect, authorize("superadmin"), deleteSociety);
-router.get("/:id/with-details", protect, authorize("superadmin"), getSocietyWithBlocks);
-router.get("/:id/details", protect, authorize("superadmin", "admin"), getSocietyDetails);
+// ONLY SUPERADMIN
+router.post("/", protect, superAdminOnly, createSociety);
+router.delete("/:id", protect, superAdminOnly, deleteSociety);
+
+//  ADMIN + SUPERADMIN
+router.get("/", protect, adminOnly, getAllSocieties);
+router.get("/:id", protect, adminOnly, getSocietyById);
+router.put("/:id", protect, adminOnly, updateSociety);
+router.get("/:id/with-details", protect, adminOnly, getSocietyWithBlocks);
+router.get("/:id/details", protect, adminOnly, getSocietyDetails);
+
 export default router;
