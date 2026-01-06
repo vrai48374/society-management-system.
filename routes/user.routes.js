@@ -1,6 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import { validate } from "../middleware/validateMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 import {
   assignUserFullLinkage,
@@ -11,11 +12,9 @@ import {
   deleteUser,
   getUserById,
   getUserFullDetails,
+  getMyBalance,
 } from "../controllers/user.controller.js";
-import { getMyBalance } from "../controllers/user.controller.js";
 
-
-import { protect, authorize } from "../middleware/authMiddleware.js";
 import { createSociety } from "../controllers/society.controller.js";
 
 const router = express.Router();
@@ -29,7 +28,7 @@ router.get("/me", protect, getMyProfile);
 router.post(
   "/",
   protect,
-  authorize("admin", "superadmin"),
+  adminOnly,
   [
     body("name").notEmpty().withMessage("Name is required"),
     body("email").isEmail().withMessage("Valid email is required"),
@@ -41,11 +40,11 @@ router.post(
   createUser
 );
 
-// Assign user to flat
+// Assign user to flat (Admin/Superadmin)
 router.post(
   "/assign",
   protect,
-  authorize("superadmin", "admin"),
+  adminOnly,
   [
     body("userId").isMongoId().withMessage("Valid userId is required"),
     body("flatId").isMongoId().withMessage("Valid flatId is required"),
@@ -58,14 +57,14 @@ router.post(
 router.post(
   "/create",
   protect,
-  authorize("superadmin"),
+  adminOnly, // superadmin check should be inside controller if needed
   [body("name").notEmpty().withMessage("Society name is required")],
   validate,
   createSociety
 );
 
 // Admin - Get all users
-router.get("/", protect, authorize("admin"), getAllUsers);
+router.get("/", protect, adminOnly, getAllUsers);
 
 // ---------------- DYNAMIC ROUTES AFTER ---------------- //
 
@@ -73,7 +72,7 @@ router.get("/", protect, authorize("admin"), getAllUsers);
 router.put(
   "/:id",
   protect,
-  authorize("admin","resident"),
+  adminOnly,
   [
     param("id").isMongoId().withMessage("Invalid user ID"),
     body("name").optional().notEmpty().withMessage("Name cannot be empty"),
@@ -87,7 +86,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
-  authorize("admin"),
+  adminOnly,
   [param("id").isMongoId().withMessage("Invalid user ID")],
   validate,
   deleteUser
@@ -97,7 +96,7 @@ router.delete(
 router.get(
   "/:id",
   protect,
-  authorize("admin"),
+  adminOnly,
   [param("id").isMongoId().withMessage("Invalid user ID")],
   validate,
   getUserById
@@ -107,10 +106,13 @@ router.get(
 router.get(
   "/:id/full",
   protect,
-  authorize("admin", "superadmin"),
+  adminOnly,
   [param("id").isMongoId().withMessage("Invalid user ID")],
   validate,
   getUserFullDetails
 );
+
+// Get my balance
 router.get("/my-balance", protect, getMyBalance);
+
 export default router;
